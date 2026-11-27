@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cut Craft — video editing & motion studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Inter+Tight:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#0b0b0c;--fg:#f5f1ea;--ac:#ff3b1f;--mut:#9b958c;--line:#2a2a2c;--paper:#f1ede4;--g:clamp(18px,3vw,44px)}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font:400 17px/1.55 'Inter Tight',system-ui,sans-serif;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--ac);outline-offset:3px}
+h1,h2,h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;letter-spacing:-.035em;line-height:.95}
+.wrap{padding:0 var(--g)}
+section{padding:clamp(70px,10vw,140px) 0}
+
+/* nav */
+nav{position:fixed;inset:0 0 auto;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:16px var(--g);mix-blend-mode:difference;color:#fff;font-weight:600;font-size:15px}
+nav .links{display:flex;gap:26px}
+@media(max-width:700px){nav .links a:not(.cta){display:none}}
+
+/* hero */
+.hero{min-height:100svh;padding:110px 0 0;display:flex;flex-direction:column;justify-content:space-between}
+.hero h1{font-size:clamp(64px,17vw,300px);margin:0 var(--g);line-height:.82}
+.hero h1 span{display:block;overflow:hidden}
+.hero h1 b{display:block;font-weight:800;transform:translateY(105%);animation:up .9s cubic-bezier(.2,.75,.2,1) forwards}
+.hero h1 span:nth-child(2) b{animation-delay:.12s;color:var(--ac);margin-left:clamp(20px,9vw,160px)}
+@keyframes up{to{transform:none}}
+.hero .sub{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap;margin:34px var(--g) 28px;align-items:end}
+.hero .sub p{max-width:30em;font-size:clamp(17px,1.6vw,22px);font-weight:500;line-height:1.3}
+
+/* timeline strip */
+.tl{position:relative;border-top:1px solid var(--line);padding:14px 0 18px;overflow:hidden}
+.tl-ruler{display:flex;justify-content:space-between;padding:0 var(--g);color:var(--mut);font-size:12px;font-variant-numeric:tabular-nums}
+.tl-track{display:flex;gap:6px;margin-top:12px;padding:0 var(--g);will-change:transform}
+.clip{flex:none;height:64px;border-radius:6px;background:#1a1a1c center/cover;display:flex;align-items:flex-end;padding:6px 8px;font-size:12px;font-weight:600;position:relative;overflow:hidden}
+.clip::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent,#000a)}
+.clip span{position:relative;z-index:1}
+.playhead{position:absolute;top:0;bottom:0;left:var(--g);width:2px;background:var(--ac);z-index:2}
+.playhead::before{content:"";position:absolute;top:0;left:-6px;border:7px solid transparent;border-top:10px solid var(--ac);border-bottom:0}
+
+/* work */
+.head{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:50px}
+.head h2{font-size:clamp(44px,8vw,120px)}
+.head small{color:var(--mut);font-size:15px}
+.cf{position:relative;height:clamp(260px,34vw,440px);perspective:1200px;overflow:hidden;cursor:grab;touch-action:pan-y;outline:none}
+.cf:active{cursor:grabbing}
+.cf-card{position:absolute;left:50%;top:50%;width:clamp(180px,26vw,360px);aspect-ratio:1;margin-top:calc(clamp(180px,26vw,360px)/-2);border-radius:18px;overflow:hidden;background:#1a1a1c center/cover;will-change:transform;box-shadow:0 20px 50px #0009}
+.cf-card video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cap{text-align:center;margin-top:18px;min-height:90px}
+.cap h3{font-size:26px}
+.cap p{color:var(--mut);font-size:14px;margin-top:6px}
+.arrows{display:flex;gap:10px;justify-content:center;margin-top:14px}
+.arrows button{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--fg);font-size:20px;cursor:pointer;transition:background .2s}
+.arrows button:hover{background:var(--ac);border-color:var(--ac)}
+
+/* showreel */
+.reel{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-top:clamp(50px,7vw,100px)}
+@media(max-width:800px){.reel{grid-template-columns:1fr}}
+figure{position:relative}
+figure video{width:100%;height:100%;min-height:260px;object-fit:cover;border-radius:20px;background:#1a1a1c;display:block}
+figcaption{display:flex;justify-content:space-between;margin-top:10px;font-size:14px;color:var(--mut)}
+.ctl{position:absolute;right:12px;top:12px;display:flex;gap:8px}
+.ctl button{border:0;border-radius:99px;padding:8px 14px;font:600 13px 'Inter Tight';background:#0b0b0cb3;color:var(--fg);cursor:pointer;backdrop-filter:blur(8px)}
+.ctl button:hover{background:var(--ac)}
+
+/* services */
+.svc{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));border-top:1px solid var(--line)}
+.svc article{padding:30px 26px 40px 0;border-bottom:1px solid var(--line)}
+.svc article+article{padding-left:26px;border-left:1px solid var(--line)}
+@media(max-width:700px){.svc article+article{border-left:0;padding-left:0}}
+.svc svg{width:34px;height:34px;stroke:var(--ac);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.svc h3{font-size:30px;margin:26px 0 12px}
+.svc p{color:var(--mut);margin-bottom:16px}
+.svc li{list-style:none;padding:7px 0;border-top:1px solid var(--line);font-size:15px}
+
+@media(min-width:1000px){.svc{grid-template-columns:repeat(4,1fr)}.svc article:nth-child(4n+1){border-left:0;padding-left:0}}
+@media(min-width:701px) and (max-width:999px){.svc{grid-template-columns:repeat(2,1fr)}.svc article:nth-child(odd){border-left:0;padding-left:0}}
+
+/* about */
+.about{display:grid;grid-template-columns:1.3fr 1fr;gap:60px;align-items:end}
+@media(max-width:800px){.about{grid-template-columns:1fr}}
+.about p.big{font-size:clamp(26px,3.6vw,50px);font-family:'Bricolage Grotesque';font-weight:500;letter-spacing:-.025em;line-height:1.1}
+.stats{display:grid;gap:22px}
+.stats div{border-top:1px solid var(--line);padding-top:12px}
+.stats b{font:800 clamp(44px,6vw,80px)/1 'Bricolage Grotesque';letter-spacing:-.04em;display:block}
+.stats span{color:var(--mut)}
+.btn{display:inline-block;margin-top:34px;background:var(--ac);color:#fff;padding:16px 28px;border-radius:99px;font-weight:600;transition:transform .3s}
+.btn:hover{transform:translateY(-3px)}
+
+/* footer: torn poster */
+footer{position:relative;background:var(--paper);color:#111;margin-top:30px}
+.sheet{background:var(--ac);color:#fff;padding:60px var(--g) 140px;display:grid;grid-template-columns:1fr auto 1fr;gap:30px;align-items:start;
+clip-path:polygon(0 0,100% 0,100% 82%,96% 90%,92% 80%,88% 93%,83% 84%,78% 95%,72% 86%,66% 92%,60% 98%,54% 90%,50% 100%,46% 90%,40% 98%,34% 92%,28% 86%,22% 95%,17% 84%,12% 93%,8% 80%,4% 90%,0 82%)}
+@media(max-width:800px){.sheet{grid-template-columns:1fr;text-align:left}}
+.sheet h3{font-size:clamp(40px,6vw,84px)}
+.sheet form{display:flex;background:#fff;border-radius:99px;padding:5px;width:min(100%,360px);margin-top:16px}
+.sheet input{flex:1;min-width:0;border:0;background:none;padding:0 16px;font:inherit;color:#111;outline:none}
+.sheet form button{border:0;background:var(--ac);color:#fff;border-radius:50%;width:42px;height:42px;font-size:18px;cursor:pointer}
+.sheet ul{list-style:none;padding:0;display:grid;gap:6px;font-size:16px}
+.sheet ul a:hover{text-decoration:underline}
+.sheet .r{justify-self:end;text-align:right}
+@media(max-width:800px){.sheet .r{justify-self:start;text-align:left}}
+.paper{padding:10px var(--g) 28px;text-align:center}
+.paper .word{font:800 clamp(70px,19vw,320px)/.9 'Bricolage Grotesque';letter-spacing:-.06em}
+.paper .row{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:14px;margin-top:20px}
+.paper .tiny{font-size:11px;letter-spacing:.04em;opacity:.6;margin-top:22px}
+.pin{position:absolute;left:50%;top:calc(100% - 100% + 0px);}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.hero h1 b{transform:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#top">Cut Craft</a>
+  <div class="links"><a href="#work">Work</a><a href="#services">Services</a><a href="#about">About</a></div>
+</nav>
+
+<header class="hero" id="top">
+  <h1 aria-label="Cut Craft"><span><b>Cut</b></span><span><b>Craft</b></span></h1>
+  <div>
+    <div class="sub">
+      <p>A video editing and motion studio cutting commercials, short films and social content for ambitious brands. We create ads for brands and AI videos for faceless YouTube channels.</p>
+    </div>
+    <div class="tl" aria-hidden="true">
+      <div class="tl-ruler"><span>00:00</span><span>00:15</span><span>00:30</span><span>00:45</span><span>01:00</span></div>
+      <div class="tl-track" id="track"></div>
+      <div class="playhead"></div>
+    </div>
+  </div>
+</header>
+
+<section id="work">
+  <div class="wrap">
+    <div class="head"><h2>Cut with intent.</h2><small>Selected work. Drag, or use the arrow keys.</small></div>
+  </div>
+  <div class="cf" id="cf" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Selected work"></div>
+  <div class="cap" id="cap"></div>
+  <div class="arrows"><button id="prev" aria-label="Previous project">&#8592;</button><button id="next" aria-label="Next project">&#8594;</button></div>
+
+  <div class="wrap">
+    <div class="reel">
+      <figure>
+        <video src="videos/b_An_ultra_slow-motion.mp4" poster="videos/reel1-poster.jpg" muted loop playsinline preload="metadata"></video>
+        <div class="ctl"><button data-play>Pause</button><button data-mute>Unmute</button></div>
+        <figcaption><span>Ultra slow-motion reel</span><span>Showreel 01</span></figcaption>
+      </figure>
+      <figure>
+        <video src="videos/gemini-omni-1_2-flash_a_A_polished_short_com.mp4" poster="videos/reel2-poster.jpg" muted loop playsinline preload="metadata"></video>
+        <div class="ctl"><button data-play>Pause</button><button data-mute>Unmute</button></div>
+        <figcaption><span>Polished short commercial</span><span>Showreel 02</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="wrap">
+    <div class="head"><h2>What we edit.</h2></div>
+    <div class="svc">
+      <article>
+        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg>
+        <h3>Commercial editing</h3><p>Brand films and ads cut to land the message in seconds.</p>
+        <ul><li>30–90s spots</li><li>Brand films</li><li>Launch videos</li></ul>
+      </article>
+      <article>
+        <svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></svg>
+        <h3>Short-form and social</h3><p>Vertical cuts built for the first second and the scroll.</p>
+        <ul><li>Reels and Shorts</li><li>Ad variants</li><li>Captions and resizing</li></ul>
+      </article>
+      <article>
+        <svg viewBox="0 0 24 24"><path d="M4 18c3-9 6-9 8 0s5 9 8-12"/><circle cx="4" cy="18" r="1.3"/><circle cx="20" cy="6" r="1.3"/></svg>
+        <h3>Motion graphics</h3><p>Titles, lower thirds and animated logos that match your brand.</p>
+        <ul><li>Title sequences</li><li>Logo stings</li><li>Explainers</li></ul>
+      </article>
+      <article>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17M12 12h8.5"/></svg>
+        <h3>Color and sound finishing</h3><p>Grade, mix and master so every cut looks and sounds finished.</p>
+        <ul><li>Color grading</li><li>Sound design and mix</li><li>Delivery masters</li></ul>
+      </article>
+      <article>
+        <svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M3 9h18M10.5 12.5 8.5 14.5l2 2M13.5 12.5l2 2-2 2"/></svg>
+        <h3>Website and software development</h3><p>Fast, clean websites and custom software built around your brand.</p>
+        <ul><li>Portfolio and business sites</li><li>Web apps and dashboards</li><li>Hosting and maintenance</li></ul>
+      </article>
+      <article>
+        <svg viewBox="0 0 24 24"><rect x="3" y="6" width="14" height="12" rx="2"/><path d="m17 10.5 4-2v7l-4-2M19 3v3M17.5 4.5h3"/></svg>
+        <h3>AI videos for YouTube channels</h3><p>Faceless, niche channel videos made with AI, from script to final cut.</p>
+        <ul><li>Faceless channel videos</li><li>AI voiceover and visuals</li><li>Shorts and thumbnails</li></ul>
+      </article>
+      <article>
+        <svg viewBox="0 0 24 24"><path d="M12 3.5l1.8 4.7 4.7 1.8-4.7 1.8L12 16.5l-1.8-4.7L5.5 10l4.7-1.8zM18.5 15l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></svg>
+        <h3>AI ads for brands</h3><p>Scroll-stopping ads made with AI and delivered fast.</p>
+        <ul><li>Product and brand ads</li><li>Multiple ad variants</li><li>Quick turnarounds</li></ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap about">
+    <div>
+      <p class="big">We are a small studio of editors, colorists and motion designers. We work for brands that want footage to feel like a story, and we turn projects around fast. We create ads for brands, and we make AI videos for faceless YouTube channels.</p>
+    </div>
+    <div class="stats">
+      <div><b data-n="120">0</b><span>projects delivered</span></div>
+      <div><b data-n="40">0</b><span>brands</span></div>
+      <div><b data-n="48">0</b><span>hour turnarounds</span></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="sheet">
+    <div>
+      <h3>New cuts,<br>once a month.</h3>
+      <form id="nl"><input type="email" placeholder="your@email" aria-label="Email address" required><button aria-label="Subscribe">&#8594;</button></form>
+      <p id="nlmsg" role="status" style="margin-top:10px;font-size:14px"></p>
+    </div>
+    <div style="text-align:center;font-weight:600">Booking projects for Q1<br><span id="clock" style="font-variant-numeric:tabular-nums;opacity:.8"></span></div>
+    <div class="r">
+      <ul><li><a href="#work">Work</a></li><li><a href="#services">Services</a></li><li><a href="#about">About</a></li><li><a href="mailto:hostrywork05@gmail.com">hostrywork05@gmail.com</a></li></ul>
+      <ul style="margin-top:18px"><li><a href="https://www.instagram.com/cutcraft98/" target="_blank" rel="noopener noreferrer">Instagram</a></li><li><a href="https://x.com/cutcraftsnk21" target="_blank" rel="noopener noreferrer">X</a></li><li><a href="https://www.linkedin.com/in/cut-crafts-62a569452/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li></ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="word">cutcraft.</div>
+    <div class="row"><span>&copy; 2026 Cut Craft</span><span>@cutcraft</span></div>
+    <div class="tiny">cut by hand</div>
+  </div>
+</footer>
+
+<script>
+const U=id=>`https://images.unsplash.com/photo-${id}?w=700&h=700&fit=crop&q=70&auto=format`;
+const S=[
+ ["1485846234645-a62644f84728","Neon Drive","Brand film","2025","Auto brand","1:30"],
+ ["1536440136628-849c177e76a1","Last Reel","Short film","2024","Indie studio","12:10"],
+ ["1470071459604-3b5ec3a7fe05","Low Country","Travel film","2025","Tourism board","2:45"],
+ ["1465101162946-4377e57745c3","Third Rail","Music video","2024","Label","3:07"],
+ ["1501785888041-af3ef285b470","Still Water","Brand film","2023","Outdoor brand","1:15"],
+ ["1519681393784-d120267933ba","Undertow","Product launch","2025","Tech startup","0:60"],
+ ["1500534314209-a25ddb2bd429","Dry Season","Social cuts","2024","Apparel","0:30"],
+ ["1441974231531-c6227db76b6e","Understory","Documentary","2023","Nonprofit","8:20"]
+];
+/* timeline clips */
+const track=document.getElementById('track');
+S.concat(S).forEach((s,i)=>{const c=document.createElement('div');c.className='clip';c.style.width=(110+(i*37)%90)+'px';c.style.backgroundImage=`url(${U(s[0])})`;c.innerHTML=`<span>${s[1]}</span>`;track.appendChild(c)});
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+addEventListener('scroll',()=>{if(!reduce)track.style.transform=`translateX(${-scrollY*.6}px)`},{passive:true});
+
+/* coverflow */
+const cf=document.getElementById('cf'),cap=document.getElementById('cap');
+const cards=S.map((s,i)=>{const d=document.createElement('div');d.className='cf-card';d.style.backgroundImage=`url(${U(s[0])})`;d.setAttribute('role','group');d.setAttribute('aria-label',`${i+1} of ${S.length}`);cf.appendChild(d);return d});
+let pos=0,target=0,raf=0,drag=null;const n=S.length;
+function paint(){
+ const w=cards[0].offsetWidth,pitch=w*1.05;
+ cards.forEach((c,i)=>{
+  let o=i-pos;o=((o%n)+n)%n;if(o>n/2)o-=n;
+  const d=Math.abs(o),r=Math.pow(d,.56),tilt=Math.min(44*r,82)*Math.sign(o);
+  c.style.transform=`translateX(calc(-50% + ${o*pitch}px)) translateZ(${-.6*w*r}px) rotateY(${-tilt}deg)`;
+  c.style.opacity=Math.max(0,1-.1*d)*Math.min(1,Math.max(0,n/2-d));
+  c.style.zIndex=100-Math.round(d);
+ });
+}
+function caption(){const k=((Math.round(pos)%n)+n)%n,s=S[k];
+ cap.innerHTML=`<h3>${s[1]}</h3><p>${s[2]} &middot; ${s[3]} &middot; ${s[4]} &middot; ${s[5]}</p>`;
+ cards.forEach((c,i)=>{const v=c.querySelector('video');if(i!==k&&v)v.remove()});
+}
+function settle(t){target=t;cancelAnimationFrame(raf);caption();
+ const step=()=>{const r=target-pos;if(Math.abs(r)<.0005){pos=target;paint();return}
+  pos+=r*.16;paint();raf=requestAnimationFrame(step)};raf=requestAnimationFrame(step)}
+const nudge=b=>settle(Math.round(target)+b);
+document.getElementById('prev').onclick=()=>nudge(-1);
+document.getElementById('next').onclick=()=>nudge(1);
+cf.onkeydown=e=>{if(e.key==='ArrowLeft'){e.preventDefault();nudge(-1)}if(e.key==='ArrowRight'){e.preventDefault();nudge(1)}};
+cf.onpointerdown=e=>{cancelAnimationFrame(raf);cf.setPointerCapture(e.pointerId);drag={x:e.clientX,p:pos,v:0,t:performance.now(),l:pos}};
+cf.onpointermove=e=>{if(!drag)return;const pitch=cards[0].offsetWidth*1.05,now=performance.now(),prev=pos;
+ pos=drag.p-(e.clientX-drag.x)/pitch;drag.v=(pos-prev)/Math.max(now-drag.t,1)*1000;drag.t=now;paint()};
+cf.onpointerup=cf.onpointercancel=()=>{if(!drag)return;const c=Math.max(-2,Math.min(2,drag.v*.18));drag=null;settle(Math.round(pos+c))};
+addEventListener('resize',paint);paint();caption();
+
+/* showreel: play only in view */
+document.querySelectorAll('figure').forEach(f=>{
+ const v=f.querySelector('video'),p=f.querySelector('[data-play]'),m=f.querySelector('[data-mute]');
+ new IntersectionObserver(([e])=>{e.isIntersecting?v.play().catch(()=>{}):v.pause()},{threshold:.4}).observe(v);
+ v.addEventListener('play',()=>p.textContent='Pause');v.addEventListener('pause',()=>p.textContent='Play');
+ p.onclick=()=>v.paused?v.play():v.pause();
+ m.onclick=()=>{v.muted=!v.muted;m.textContent=v.muted?'Unmute':'Mute'};
+});
+
+/* stats count-up */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;io.unobserve(e.target);
+ const t=+e.target.dataset.n,s=performance.now();
+ const f=now=>{const k=Math.min(1,(now-s)/1200);e.target.textContent=Math.round(t*(1-Math.pow(1-k,3)))+(t===48?'h':'+');if(k<1)requestAnimationFrame(f)};requestAnimationFrame(f)}),{threshold:.6});
+document.querySelectorAll('[data-n]').forEach(el=>io.observe(el));
+
+/* footer clock + newsletter */
+const fmt=new Intl.DateTimeFormat('en-GB',{hour:'2-digit',minute:'2-digit',hourCycle:'h23',timeZone:'Asia/Kolkata'});
+const clock=()=>document.getElementById('clock').textContent='IST '+fmt.format(new Date());clock();setInterval(clock,10000);
+document.getElementById('nl').onsubmit=e=>{e.preventDefault();document.getElementById('nlmsg').textContent="You're on the list."};
+</script>
+</body>
+</html>
